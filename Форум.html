@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><center>Форум района Кузьминки</center></title>
+    <style>
+        body {
+            font-family: Times New Roman, sans-serif;
+            margin: 20px;
+        }
+        #forum {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .message {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .message .author {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .message .time {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .message .content {
+            margin-top: 5px;
+        }
+        #new-message {
+            margin-top: 20px;
+        }
+        #new-message textarea {
+            width: 100%;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+        #new-message button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #new-message button:hover {
+            background-color: #218838;
+        }
+        #auth-block {
+            margin-bottom: 20px;
+        }
+        #auth-block input {
+            padding: 5px;
+            margin-right: 10px;
+        }
+        #auth-block button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #auth-block button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="forum">
+        <h1>Форум района Кузьминки</h1>
+
+        <div id="auth-block">
+            <input type="text" id="username" placeholder="Введите ваше имя">
+            <button onclick="login()">Войти</button>
+            <span id="current-user"></span>
+        </div>
+
+        <div id="messages"></div>
+
+        <div id="new-message">
+            <textarea id="message-content" placeholder="Напишите ваше сообщение..."></textarea>
+            <button onclick="addMessage()">Отправить</button>
+        </div>
+    </div>
+
+    <script>
+        let messages = [];
+        let currentUser = null;
+
+        function loadData() {
+            const storedMessages = localStorage.getItem('forumMessages');
+            if (storedMessages) {
+                messages = JSON.parse(storedMessages);
+            }
+
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                currentUser = storedUser;
+                document.getElementById('current-user').textContent = `Вы вошли как: ${currentUser}`;
+            }
+        }
+
+        function saveMessages() {
+            localStorage.setItem('forumMessages', JSON.stringify(messages));
+        }
+
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            if (username === "") {
+                alert("Имя пользователя не может быть пустым!");
+                return;
+            }
+
+            currentUser = username;
+            localStorage.setItem('currentUser', currentUser);
+            document.getElementById('current-user').textContent = `Вы вошли как: ${currentUser}`;
+            document.getElementById('username').value = "";
+        }
+
+        function addMessage() {
+            if (!currentUser) {
+                alert("Сначала войдите в систему!");
+                return;
+            }
+
+            const content = document.getElementById('message-content').value.trim();
+            if (content === "") {
+                alert("Сообщение не может быть пустым!");
+                return;
+            }
+
+            const message = {
+                author: currentUser,
+                content: content,
+                time: new Date()
+            };
+
+            messages.push(message);
+            messages.sort((a, b) => b.time - a.time);
+            saveMessages();
+            document.getElementById('message-content').value = "";
+            renderMessages();
+        }
+
+        function renderMessages() {
+            const messagesContainer = document.getElementById('messages');
+            messagesContainer.innerHTML = "";
+
+            messages.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+
+                const authorElement = document.createElement('div');
+                authorElement.classList.add('author');
+                authorElement.textContent = message.author;
+
+                const timeElement = document.createElement('div');
+                timeElement.classList.add('time');
+                timeElement.textContent = message.time.toLocaleString();
+
+                const contentElement = document.createElement('div');
+                contentElement.classList.add('content');
+                contentElement.textContent = message.content;
+
+                messageElement.appendChild(authorElement);
+                messageElement.appendChild(timeElement);
+                messageElement.appendChild(contentElement);
+
+                messagesContainer.appendChild(messageElement);
+            });
+        }
+
+        loadData();
+        renderMessages();
+    </script>
+</body>
+    <div class="links-block">
+<center><a href="file:///D:/проект/сайт%20правила.html">Правила форума </a></center>
+</div>
+
+<link rel="stylesheet" href="дизайн.css">
+
+</html>
